@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 360" role="img" aria-labelledby="title desc">
+  <title id="title">A simple knowledge garden map</title>
+  <desc id="desc">Connected nodes illustrating notes, questions, projects, and references.</desc>
+  <rect width="960" height="360" rx="28" fill="#1d2723"/>
+  <g stroke="#87bcae" stroke-width="2" opacity="0.55">
+    <path d="M160 180 350 92 520 190 735 96 820 230"/>
+    <path d="M160 180 330 270 520 190 650 278 820 230"/>
+    <path d="M350 92 735 96M330 270 650 278" stroke-dasharray="7 9"/>
+  </g>
+  <g fill="#f2efe6" stroke="#87bcae" stroke-width="4">
+    <circle cx="160" cy="180" r="45"/>
+    <circle cx="350" cy="92" r="30"/>
+    <circle cx="330" cy="270" r="26"/>
+    <circle cx="520" cy="190" r="58" fill="#87bcae"/>
+    <circle cx="735" cy="96" r="34"/>
+    <circle cx="650" cy="278" r="24"/>
+    <circle cx="820" cy="230" r="42" fill="#d58a64" stroke="#d58a64"/>
+  </g>
+</svg>
