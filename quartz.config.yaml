@@ -1,12 +1,12 @@
 # yaml-language-server: $schema=./quartz/plugins/quartz-plugins.schema.json
 configuration:
-  pageTitle: Notes & Margins
-  pageTitleSuffix: " · Personal knowledge garden"
+  pageTitle: 今晓的花园
+  pageTitleSuffix: " · 今晓的花园"
   enableSPA: true
   enablePopovers: true
   analytics: null
   locale: zh-CN
-  baseUrl: example.github.io/personal-homepage
+  baseUrl: h-riito.github.io/jinxiao-garden
   ignorePatterns:
     - private
     - templates
@@ -15,9 +15,9 @@ configuration:
     fontOrigin: local
     cdnCaching: false
     typography:
-      title: Georgia
-      header: Georgia
-      body: Segoe UI
+      title: Garden Source Han Sans
+      header: Garden Source Han Sans
+      body: Garden Source Han Sans
       code: Cascadia Mono
     colors:
       lightMode:
@@ -101,17 +101,18 @@ plugins:
   - source: "@quartz-community/quartz-fonts"
     enabled: true
     options:
-      useThemeFonts: true
+      useThemeFonts: false
       fontOrigin: local
+      title: Garden Source Han Sans
+      header: Garden Source Han Sans
+      body: Garden Source Han Sans
+      interface: Garden Source Han Sans
+      code: Cascadia Mono
   - source: "@quartz-themes/core"
     enabled: false
     options:
       theme: tokyo-night
       mode: both
-  - source: "@quartz-community/remove-draft"
-    enabled: true
-  - source: "@quartz-community/explicit-publish"
-    enabled: true
   - source: "@quartz-community/alias-redirects"
     enabled: true
   - source: "@quartz-community/content-index"
@@ -135,11 +136,27 @@ plugins:
     enabled: true
   - source: "@quartz-community/explorer"
     enabled: true
+    options:
+      sortFn: |-
+        (a, b) => {
+          const compareName = () => (a.displayName || "").localeCompare(
+            b.displayName || "",
+            undefined,
+            { numeric: true, sensitivity: "base" },
+          )
+
+          if (a.isFolder !== b.isFolder) return a.isFolder ? -1 : 1
+          if (!a.isFolder) return compareName()
+
+          const orderA = Number.isInteger(a.data?.folderOrder) ? a.data.folderOrder : 0
+          const orderB = Number.isInteger(b.data?.folderOrder) ? b.data.folderOrder : 0
+          return orderA - orderB || compareName()
+        }
     layout:
       position: left
       priority: 50
   - source: "@quartz-community/graph"
-    enabled: true
+    enabled: false
     layout:
       position: right
       priority: 10
@@ -186,7 +203,7 @@ plugins:
       priority: 30
       group: toolbar
   - source: "@quartz-community/reader-mode"
-    enabled: true
+    enabled: false
     layout:
       position: left
       priority: 35
@@ -206,7 +223,7 @@ plugins:
       position: afterBody
       priority: 10
   - source: "@quartz-community/footer"
-    enabled: true
+    enabled: false
     options:
       links:
         Built with Quartz: https://quartz.jzhao.xyz/

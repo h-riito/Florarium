@@ -1,3 +1,776 @@
 @use "./variables.scss" as *;
 
-// put your custom CSS here!
+@font-face {
+  font-family: "Garden Source Han Sans";
+  src:
+    local("思源黑体 CN"),
+    local("Source Han Sans Regular"),
+    url("./static/fonts/source-han-sans-cn-regular.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Garden Source Han Sans";
+  src:
+    local("思源黑体 CN Medium"),
+    local("Source Han Sans Medium"),
+    url("./static/fonts/source-han-sans-cn-medium.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 500 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Garden Source Han Sans";
+  src:
+    local("思源黑体 CN Bold"),
+    local("Source Han Sans Bold"),
+    url("./static/fonts/source-han-sans-cn-bold.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 700 900;
+  font-display: swap;
+}
+
+:root {
+  --source-han-sans:
+    "Garden Source Han Sans", "思源黑体 CN", "Source Han Sans CN", "Source Han Sans SC",
+    "Noto Sans CJK SC", "Noto Sans SC", sans-serif;
+  --titleFont: var(--source-han-sans);
+  --headerFont: var(--source-han-sans);
+  --bodyFont: var(--source-han-sans);
+  --garden-note-font-size: 1rem;
+}
+
+footer {
+  font-size: 0.72rem;
+}
+
+// Keep the explorer quiet until an item is selected, with compact single-line labels.
+.explorer {
+  --explorer-row-height: 2rem;
+
+  &,
+  button,
+  a,
+  .explorer-content,
+  .explorer-content ul,
+  .explorer-content li,
+  .folder-container,
+  .folder-icon {
+    cursor: pointer;
+  }
+
+  .explorer-content ul li > a,
+  .folder-container div > a,
+  .folder-container div > button span {
+    color: var(--darkgray);
+    display: block;
+    opacity: 1;
+    line-height: var(--explorer-row-height);
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .explorer-content ul li > a.active,
+  .folder-container div > a.active,
+  .folder-container div > button.active span {
+    color: var(--secondary);
+  }
+
+  .folder-container {
+    align-items: center;
+
+    > div {
+      flex: 1;
+      min-width: 0;
+    }
+
+    div > button {
+      min-width: 0;
+      width: 100%;
+    }
+  }
+
+  .course-revision-indicator {
+    width: 0.48rem;
+    height: 0.48rem;
+    margin: 0 0.3rem 0 0.5rem;
+    border-radius: 50%;
+    flex: 0 0 auto;
+    background: var(--gray);
+  }
+
+  .folder-container[data-revision-status="1"] > .course-revision-indicator {
+    background: var(--secondary);
+    box-shadow: 0 0 0 0.14rem color-mix(in srgb, var(--secondary) 14%, transparent);
+  }
+
+  .folder-icon {
+    color: var(--darkgray);
+  }
+
+  li:has(> .folder-container a.active) > .folder-container > .folder-icon {
+    color: var(--secondary);
+  }
+}
+
+.course-revision-summary {
+  margin-top: -0.35rem;
+  color: var(--gray);
+  font-size: 0.9em;
+}
+
+// Folder pages keep dates in their source metadata, but previews only show the
+// title and tags. Removing the date column also avoids leaving empty space.
+.page-listing li.section-li > .section {
+  grid-template-columns: minmax(0, 1fr) auto;
+
+  > .meta {
+    display: none;
+  }
+}
+
+.garden-page-title {
+  font-size: calc(var(--garden-note-font-size) * 1.25);
+  line-height: 1.35;
+  margin: 0 0 0.75rem;
+}
+
+// Treat every textual element in the reading column as part of the note.
+// Ratios preserve the heading hierarchy while the reader controls one shared
+// base size. The site footer and next-note control sit outside `.center`.
+body:not([data-slug="index"]) .center {
+  font-size: var(--garden-note-font-size);
+
+  .garden-page-title {
+    font-size: 1.25em;
+  }
+
+  h1 {
+    font-size: 1.75em;
+  }
+
+  h2 {
+    font-size: 1.4em;
+  }
+
+  h3 {
+    font-size: 1.12em;
+  }
+
+  h4,
+  h5,
+  h6 {
+    font-size: 1em;
+  }
+
+  article > h1 {
+    font-size: 2em;
+  }
+
+  figure[data-rehype-pretty-code-figure] > [data-rehype-pretty-code-title] {
+    font-size: 0.9em;
+  }
+
+  pre > code {
+    font-size: 0.85em;
+  }
+}
+
+.page-title,
+.page-title > a,
+.garden-responsive-title {
+  font-weight: 700;
+}
+
+// Keep ordinary article content on one stable cursor. Real links remain clickable,
+// while the heading-anchor glyph no longer flips the cursor as it fades in.
+.center article .markdown-preview-view {
+  cursor: default;
+  font-size: var(--garden-note-font-size);
+
+  :is(p, li, tbody) {
+    line-height: 1.6;
+  }
+
+  a[role="anchor"],
+  a[role="anchor"] * {
+    cursor: default;
+  }
+
+  strong {
+    color: var(--secondary);
+    font-weight: 700;
+  }
+}
+
+.garden-font-control {
+  align-items: center;
+  display: none;
+  position: relative;
+
+  &.is-ready {
+    display: flex;
+  }
+}
+
+.garden-font-toggle {
+  align-items: center;
+  background: none;
+  border: 0;
+  color: var(--darkgray);
+  cursor: pointer;
+  display: flex;
+  height: 32px;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  width: 24px;
+
+  &:hover,
+  &[aria-expanded="true"] {
+    color: var(--secondary);
+  }
+}
+
+.garden-font-icon {
+  align-items: baseline;
+  display: flex;
+  font-family: var(--source-han-sans);
+  font-weight: 700;
+  gap: 1px;
+  line-height: 1;
+
+  > span:first-child {
+    font-size: 1rem;
+  }
+
+  > span:last-child {
+    font-size: 0.65rem;
+  }
+}
+
+.garden-font-menu {
+  background: var(--light);
+  border: 1px solid var(--lightgray);
+  border-radius: 0.75rem;
+  box-shadow: 0 0.7rem 2rem color-mix(in srgb, var(--dark) 14%, transparent);
+  box-sizing: border-box;
+  display: grid;
+  gap: 0.65rem;
+  min-width: 12rem;
+  padding: 0.75rem;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.35rem);
+  z-index: 230;
+
+  &[hidden] {
+    display: none;
+  }
+
+  .garden-font-menu-header {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .garden-font-menu-title,
+  .garden-font-value {
+    color: var(--gray);
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+  }
+
+  .garden-font-value {
+    color: var(--secondary);
+    letter-spacing: 0;
+  }
+
+  .garden-font-slider {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  input[type="range"] {
+    accent-color: var(--secondary);
+    cursor: pointer;
+    margin: 0;
+    width: 100%;
+  }
+
+  .garden-font-slider-labels {
+    color: var(--gray);
+    display: flex;
+    font-size: 0.62rem;
+    justify-content: space-between;
+  }
+}
+
+.right.sidebar .toc-content {
+  li {
+    min-height: 2rem;
+  }
+
+  li > a {
+    line-height: 2rem;
+  }
+}
+
+.katex-display {
+  scrollbar-color: transparent transparent;
+  scrollbar-width: thin;
+
+  &::-webkit-scrollbar {
+    height: 0.45rem;
+  }
+
+  &::-webkit-scrollbar-track,
+  &::-webkit-scrollbar-thumb {
+    background: transparent;
+  }
+
+  &.is-scroll-ready {
+    scrollbar-color: color-mix(in srgb, var(--gray) 70%, transparent) transparent;
+
+    &::-webkit-scrollbar-thumb {
+      background: color-mix(in srgb, var(--gray) 70%, transparent);
+      border-radius: 999px;
+    }
+  }
+}
+
+.callout {
+  background-color: color-mix(in srgb, var(--light) 91%, var(--color) 9%);
+
+  .callout-title-inner {
+    font-weight: 700;
+  }
+}
+
+.markdown-preview-view img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.garden-footer {
+  align-items: flex-end;
+  display: flex;
+  gap: 1.5rem;
+  justify-content: space-between;
+  margin-bottom: 4rem;
+
+  .garden-footer-meta {
+    opacity: 0.7;
+
+    p {
+      margin: 0;
+    }
+
+    > a {
+      display: inline-block;
+      margin-top: 0.2rem;
+    }
+  }
+}
+
+.garden-next-note {
+  align-items: center;
+  border: 1px solid var(--secondary);
+  border-radius: 999px;
+  background-color: transparent;
+  color: var(--dark);
+  display: flex;
+  flex: 0 1 14.5rem;
+  gap: 0.65rem;
+  max-width: 14.5rem;
+  min-width: 0;
+  padding: 0.55rem 0.9rem;
+  text-decoration: none;
+  transition: background-color 160ms ease;
+
+  &,
+  * {
+    cursor: pointer;
+  }
+
+  &:hover {
+    background-color: color-mix(in srgb, var(--secondary) 12%, transparent);
+  }
+
+  .garden-next-arrow {
+    color: var(--secondary);
+    flex: 0 0 auto;
+    font-size: 1.05rem;
+    line-height: 1;
+  }
+
+  .garden-next-copy {
+    align-items: flex-end;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.18rem;
+    min-width: 0;
+    text-align: right;
+  }
+
+  strong {
+    color: var(--dark);
+    font-size: 0.8rem;
+    line-height: 1.2;
+  }
+
+  small {
+    color: var(--gray);
+    display: block;
+    font-size: 0.68rem;
+    line-height: 1.35;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.garden-responsive-bar,
+.garden-drawer-scrim {
+  display: none;
+}
+
+.garden-drawer-toggle {
+  align-items: center;
+  background: color-mix(in srgb, var(--light) 92%, transparent);
+  border: 1px solid var(--lightgray);
+  border-radius: 999px;
+  color: var(--darkgray);
+  cursor: pointer;
+  display: flex;
+  gap: 0.45rem;
+  justify-content: center;
+  min-height: 2.35rem;
+  padding: 0.45rem 0.75rem;
+
+  &:hover {
+    background: color-mix(in srgb, var(--secondary) 12%, var(--light));
+    border-color: var(--secondary);
+  }
+}
+
+.garden-menu-icon,
+.garden-toc-icon {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  width: 1rem;
+
+  > span {
+    background: currentColor;
+    display: block;
+    height: 1px;
+    width: 100%;
+  }
+}
+
+.garden-toc-icon > span:nth-child(2) {
+  width: 75%;
+}
+
+.garden-toc-icon > span:nth-child(3) {
+  width: 50%;
+}
+
+// On larger screens the site title and toolbar form the shared top band;
+// page content begins level with the Explorer heading below that band.
+@media all and (min-width: 800px) {
+  body:not([data-slug="index"]) .page[data-frame="default"] > #quartz-body > .center {
+    padding-top: 7rem;
+  }
+}
+
+@media all and (min-width: 1500px) {
+  body:not([data-slug="index"]) .page[data-frame="default"] {
+    max-width: 1800px;
+
+    > #quartz-body {
+      column-gap: 5px;
+      grid-template-columns: 320px 850px 320px;
+      justify-content: space-between;
+    }
+  }
+
+  body:not([data-slug="index"]) .page[data-frame="default"] > #quartz-body > .right.sidebar > .toc {
+    margin-top: 7.2rem;
+  }
+}
+
+// First compact stage: keep the left index in-flow and turn the right rail
+// into an overlay drawer, so the article never competes with all three columns.
+@media all and (min-width: 1051px) and (max-width: 1499px) {
+  body:not([data-slug="index"]) .page[data-frame="default"] > #quartz-body {
+    column-gap: clamp(3rem, 8vw, 9rem);
+    grid-template-areas:
+      "grid-sidebar-left grid-center"
+      "grid-sidebar-left grid-footer";
+    grid-template-columns: 320px minmax(0, 850px);
+    justify-content: center;
+
+    > .center {
+      grid-area: grid-center;
+      min-width: 0;
+    }
+  }
+
+  .garden-responsive-bar {
+    display: block;
+    position: fixed;
+    right: 1.25rem;
+    top: 1.25rem;
+    z-index: 210;
+
+    .garden-left-drawer-toggle,
+    .garden-responsive-title,
+    .garden-responsive-toolbar {
+      display: none;
+    }
+
+    .garden-right-drawer-toggle {
+      display: none;
+    }
+  }
+
+  body.garden-has-right-drawer .garden-responsive-bar .garden-right-drawer-toggle {
+    display: flex;
+  }
+}
+
+@media all and (max-width: 1499px) {
+  body:not([data-slug="index"]) .page[data-frame="default"] > #quartz-body > .right.sidebar {
+    background: var(--light);
+    box-shadow: -1rem 0 2.5rem color-mix(in srgb, var(--dark) 12%, transparent);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    inset: 0 0 0 auto;
+    margin: 0;
+    max-width: 88vw;
+    overflow-y: auto;
+    padding: 5.5rem 2rem 2rem;
+    position: fixed;
+    transform: translateX(105%);
+    transition: transform 220ms ease;
+    width: 320px;
+    z-index: 205;
+
+    > * {
+      flex: 0 1 auto;
+      max-height: none;
+    }
+
+    > .toc {
+      display: flex;
+    }
+  }
+
+  body.garden-right-open .page[data-frame="default"] > #quartz-body > .right.sidebar {
+    transform: translateX(0);
+  }
+
+  .garden-drawer-scrim {
+    background: color-mix(in srgb, var(--dark) 24%, transparent);
+    border: 0;
+    cursor: pointer;
+    display: block;
+    inset: 0;
+    opacity: 0;
+    padding: 0;
+    pointer-events: none;
+    position: fixed;
+    transition: opacity 180ms ease;
+    z-index: 200;
+  }
+
+  body.garden-left-open .garden-drawer-scrim,
+  body.garden-right-open .garden-drawer-scrim {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  body.garden-left-open,
+  body.garden-right-open {
+    overflow: hidden;
+  }
+}
+
+// Second compact stage: both side rails become overlay drawers. The title and
+// toolbar live in a fixed center-column bar and are removed from the left rail.
+@media all and (max-width: 1050px) {
+  body:not([data-slug="index"]) .page[data-frame="default"] > #quartz-body {
+    grid-template-areas:
+      "grid-center"
+      "grid-footer";
+    grid-template-columns: minmax(0, 850px);
+    justify-content: center;
+    padding: 4.75rem 1rem 0;
+
+    > .center {
+      grid-area: grid-center;
+      min-width: 0;
+      padding-top: 0;
+      width: 100%;
+
+      > .page-header {
+        margin-top: 0;
+      }
+    }
+
+    > footer {
+      grid-area: grid-footer;
+    }
+  }
+
+  body:not([data-slug="index"]) .page[data-frame="default"] > #quartz-body > .left.sidebar {
+    align-items: stretch;
+    background: var(--light);
+    box-shadow: 1rem 0 2.5rem color-mix(in srgb, var(--dark) 12%, transparent);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    height: 100dvh;
+    inset: 0 auto 0 0;
+    margin: 0;
+    max-width: 88vw;
+    overflow-y: auto;
+    padding: 4.75rem 2rem 2rem;
+    position: fixed;
+    transform: translateX(-105%);
+    transition: transform 220ms ease;
+    width: 320px;
+    z-index: 205;
+
+    > .page-title,
+    > .flex-component {
+      display: none;
+    }
+
+    .explorer {
+      align-self: stretch;
+      flex: 1 1 auto;
+      height: auto;
+      margin: 0;
+      order: initial;
+      overflow: hidden;
+    }
+
+    .explorer button.mobile-explorer {
+      display: none;
+    }
+
+    .explorer button.desktop-explorer {
+      display: flex;
+    }
+
+    .explorer .explorer-content,
+    .explorer.collapsed > .explorer-content,
+    .explorer:not(.collapsed) > .explorer-content {
+      box-sizing: border-box;
+      height: auto;
+      margin-top: 0.5rem;
+      max-height: none;
+      max-width: none;
+      overflow-y: auto;
+      padding: 0;
+      position: static;
+      transform: none;
+      visibility: visible;
+      width: auto;
+    }
+  }
+
+  body.garden-left-open .page[data-frame="default"] > #quartz-body > .left.sidebar {
+    transform: translateX(0);
+  }
+
+  .garden-responsive-bar {
+    align-items: center;
+    background: color-mix(in srgb, var(--light) 94%, transparent);
+    border-bottom: 1px solid var(--lightgray);
+    box-sizing: border-box;
+    display: grid;
+    gap: 0.65rem;
+    grid-template-columns: auto auto minmax(7rem, 1fr) auto;
+    inset: 0 0 auto 0;
+    min-height: 4rem;
+    padding: 0.65rem max(1rem, calc((100vw - 850px) / 2));
+    position: fixed;
+    z-index: 210;
+  }
+
+  .garden-responsive-title {
+    color: var(--dark);
+    font-size: 1rem;
+    font-weight: 700;
+    overflow: hidden;
+    text-decoration: none;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .garden-responsive-toolbar {
+    min-width: 0;
+
+    > .flex-component {
+      margin: 0;
+      min-width: 0;
+      width: 100%;
+    }
+
+    .search,
+    .search-button {
+      width: 100%;
+    }
+  }
+
+  .garden-right-drawer-toggle {
+    display: none;
+  }
+
+  body.garden-has-right-drawer .garden-right-drawer-toggle {
+    display: flex;
+  }
+}
+
+@media all and (max-width: 620px) {
+  .garden-responsive-bar {
+    gap: 0.4rem;
+    grid-template-columns: auto minmax(4.5rem, auto) minmax(5rem, 1fr) auto;
+  }
+
+  .garden-drawer-toggle {
+    padding-left: 0.6rem;
+    padding-right: 0.6rem;
+  }
+
+  .garden-right-drawer-toggle > span:first-child {
+    display: none;
+  }
+}
+
+@media all and (max-width: 800px) {
+  .garden-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .garden-next-note {
+    flex-basis: auto;
+    max-width: none;
+  }
+}

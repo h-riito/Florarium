@@ -28,8 +28,13 @@ export default (() => {
     const iconPath = joinSegments(baseDir, "static/icon.png")
 
     // Url of current page
+    const canonicalSlug = fileData.slug === "index" ? "" : fileData.slug!
     const socialUrl =
-      fileData.slug === "404" ? url.toString() : joinSegments(url.toString(), fileData.slug!)
+      fileData.slug === "404"
+        ? url.toString()
+        : canonicalSlug === ""
+          ? `${url.toString().replace(/\/$/, "")}/`
+          : joinSegments(url.toString(), canonicalSlug)
 
     const usesCustomOgImage = ctx.cfg.plugins.emitters.some((e) => e.name === "CustomOgImages")
     const ogImageDefaultPath = `https://${cfg.baseUrl}/static/og-image.png`
@@ -83,6 +88,7 @@ export default (() => {
 
         {cfg.baseUrl && (
           <>
+            {fileData.slug !== "404" && <link rel="canonical" href={socialUrl}></link>}
             <meta property="twitter:domain" content={cfg.baseUrl}></meta>
             <meta property="og:url" content={socialUrl}></meta>
             <meta property="twitter:url" content={socialUrl}></meta>

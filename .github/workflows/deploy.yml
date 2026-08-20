@@ -17,7 +17,6 @@ concurrency:
 
 jobs:
   build:
-    if: ${{ github.event.repository.private == false }}
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -41,6 +40,7 @@ jobs:
         shell: python
         run: |
           import os
+          import re
           from pathlib import Path
 
           owner, repository = os.environ["GITHUB_REPOSITORY"].split("/", 1)
@@ -48,9 +48,24 @@ jobs:
           base_url = f"{owner}.github.io{path}"
           config_path = Path("quartz.config.yaml")
           config = config_path.read_text(encoding="utf-8")
-          config = config.replace("example.github.io/personal-homepage", base_url)
+          config, replacements = re.subn(
+              r"(?m)^(\s*baseUrl:\s*).*$",
+              rf"\g<1>{base_url}",
+              config,
+              count=1,
+          )
+          if replacements != 1:
+              raise RuntimeError("Unable to update baseUrl in quartz.config.yaml")
           config_path.write_text(config, encoding="utf-8")
           print(f"Using baseUrl: {base_url}")
+
+      - name: Test publication and navigation metadata
+        run: >-
+          npm test --
+          quartz/plugins/emitters/assets.test.ts
+          quartz/plugins/emitters/courseRevision.test.ts
+          quartz/plugins/emitters/folderOrder.test.ts
+          quartz/util/folderListingSort.test.ts
 
       - name: Build site
         env:

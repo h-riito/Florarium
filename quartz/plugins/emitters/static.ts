@@ -8,7 +8,13 @@ export const Static: QuartzEmitterPlugin = () => ({
   name: "Static",
   async *emit({ argv, cfg }) {
     const staticPath = joinSegments(QUARTZ, "static")
-    const fps = await glob("**", staticPath, cfg.configuration.ignorePatterns)
+    // Keep the lossless source fonts in the repository without shipping both the
+    // OTF sources and their web-optimized WOFF2 equivalents to every visitor.
+    const sourceFontPatterns = ["fonts/source-han-sans-cn-*.otf"]
+    const fps = await glob("**", staticPath, [
+      ...cfg.configuration.ignorePatterns,
+      ...sourceFontPatterns,
+    ])
     const outputStaticPath = joinSegments(argv.output, "static")
     await fs.promises.mkdir(outputStaticPath, { recursive: true })
     for (const fp of fps) {
