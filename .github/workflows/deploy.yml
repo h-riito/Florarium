@@ -70,7 +70,7 @@ jobs:
       - name: Build site
         env:
           QUARTZ_PROTOTYPE: "0"
-        run: npx quartz build
+        run: node ./quartz/bootstrap-cli.mjs build
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
