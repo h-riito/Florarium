@@ -2,7 +2,7 @@ import styles from "../styles/prototype-home.scss"
 import type { QuartzComponent, QuartzComponentConstructor } from "./types"
 
 const PrototypeHome: QuartzComponentConstructor = () => {
-  const Component: QuartzComponent = ({ fileData, allFiles }) => {
+  const Component: QuartzComponent = ({ fileData, allFiles, cfg }) => {
     if (fileData.slug !== "index" && fileData.slug !== "") return null
 
     const notePaths = allFiles
@@ -18,7 +18,7 @@ const PrototypeHome: QuartzComponentConstructor = () => {
       <div class="prototype-home" data-prototype-home>
         <section class="prototype-variant variant-c">
           <div class="c-topline">
-            <span class="garden-site-logo" role="img" aria-label="今晓的花园" />
+            <span class="garden-site-logo" role="img" aria-label={cfg.pageTitle} />
             <button
               class="c-theme-toggle darkmode"
               type="button"
