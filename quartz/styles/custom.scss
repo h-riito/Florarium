@@ -187,6 +187,29 @@ body:not([data-slug="index"]) .center {
   font-weight: 700;
 }
 
+// The site wordmark uses the surrounding title color as a mask so the same
+// SVG follows the existing light/dark theme rules at every title position.
+.garden-site-logo,
+.page-title > a::before {
+  aspect-ratio: 764 / 163;
+  background-color: currentColor;
+  display: block;
+  -webkit-mask: url("./static/logo.svg") left center / contain no-repeat;
+  mask: url("./static/logo.svg") left center / contain no-repeat;
+}
+
+.page-title > a {
+  display: block;
+  font-size: 0;
+  line-height: 0;
+  width: fit-content;
+
+  &::before {
+    content: "";
+    width: 9rem;
+  }
+}
+
 // Keep ordinary article content on one stable cursor. Real links remain clickable,
 // while the heading-anchor glyph no longer flips the cursor as it fades in.
 .center article .markdown-preview-view {
@@ -715,12 +738,17 @@ body:not([data-slug="index"]) .center {
 
   .garden-responsive-title {
     color: var(--dark);
+    display: block;
     font-size: 1rem;
     font-weight: 700;
     overflow: hidden;
     text-decoration: none;
     text-overflow: ellipsis;
     white-space: nowrap;
+
+    .garden-site-logo {
+      width: 5rem;
+    }
   }
 
   .garden-responsive-toolbar {

@@ -1,11 +1,12 @@
 @use "./variables.scss" as *;
 
 @font-face {
-  font-family: "Garden Monaspace Xenon";
-  src: url("./static/fonts/monaspace-xenon-extrabold.woff2") format("woff2");
+  font-family: "Garden Roboto Flex Art";
+  src: url("./static/fonts/roboto-flex-garden-art.woff2") format("woff2");
   font-style: normal;
-  font-weight: 800;
+  font-weight: 600;
   font-display: swap;
+  unicode-range: U+0020-007E;
 }
 
 body[data-slug="index"] {
@@ -144,6 +145,11 @@ body[data-slug="index"] {
     > span:first-child {
       color: var(--secondary);
       font-weight: 700;
+    }
+
+    > .garden-site-logo {
+      align-self: center;
+      width: 7rem;
     }
 
     > .c-theme-toggle.darkmode {
@@ -336,14 +342,16 @@ body[data-slug="index"] {
       width: 145%;
       overflow: hidden;
       color: color-mix(in srgb, var(--secondary) 7.5%, transparent);
-      font-family: "Garden Monaspace Xenon", monospace;
+      font-family: "Garden Roboto Flex Art", sans-serif;
       font-feature-settings:
         "calt" 1,
         "liga" 1;
       font-kerning: normal;
+      font-optical-sizing: none;
+      font-synthesis: none;
       font-variant-ligatures: contextual common-ligatures;
       font-size: clamp(3.9rem, 4.8vw, 5.1rem);
-      font-weight: 800;
+      font-weight: 600;
       left: 50%;
       letter-spacing: 0.01em;
       line-height: 0.95;

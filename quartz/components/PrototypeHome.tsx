@@ -18,7 +18,7 @@ const PrototypeHome: QuartzComponentConstructor = () => {
       <div class="prototype-home" data-prototype-home>
         <section class="prototype-variant variant-c">
           <div class="c-topline">
-            <span>今晓的花园</span>
+            <span class="garden-site-logo" role="img" aria-label="今晓的花园" />
             <button
               class="c-theme-toggle darkmode"
               type="button"
@@ -44,10 +44,6 @@ const PrototypeHome: QuartzComponentConstructor = () => {
             </button>
           </div>
           <div class="c-manifesto">
-            <p class="prototype-label">
-              <span>JINXIAO</span>
-              <span>GARDEN</span>
-            </p>
             <h1 class="c-welcome">
               <span>欢迎。之后要不要</span>
               <span class="c-activity" aria-live="polite">

@@ -72,8 +72,9 @@ const GardenChrome: QuartzComponentConstructor = () => {
           <a
             class="garden-responsive-title internal"
             href={resolveRelative(slug, "index" as FullSlug)}
+            aria-label={cfg.pageTitle}
           >
-            {cfg.pageTitle}
+            <span class="garden-site-logo" aria-hidden="true" />
           </a>
           <div class="garden-responsive-toolbar" />
           <button
