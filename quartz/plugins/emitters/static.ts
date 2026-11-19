@@ -3,6 +3,7 @@ import { QuartzEmitterPlugin } from "../types"
 import fs from "fs"
 import { glob } from "../../util/glob"
 import { dirname } from "path"
+import { build } from "esbuild"
 
 export const Static: QuartzEmitterPlugin = () => ({
   name: "Static",
@@ -17,6 +18,17 @@ export const Static: QuartzEmitterPlugin = () => ({
     ])
     const outputStaticPath = joinSegments(argv.output, "static")
     await fs.promises.mkdir(outputStaticPath, { recursive: true })
+    // The homepage loads this module on demand; note pages never fetch Three.js.
+    const mapleModule = joinSegments(outputStaticPath, "home-maples.js") as FilePath
+    await build({
+      entryPoints: [joinSegments(QUARTZ, "components/scripts/home-maples.js")],
+      outfile: mapleModule,
+      bundle: true,
+      format: "esm",
+      minify: true,
+      legalComments: "inline",
+    })
+    yield mapleModule
     for (const fp of fps) {
       const src = joinSegments(staticPath, fp) as FilePath
       const dest = joinSegments(outputStaticPath, fp) as FilePath

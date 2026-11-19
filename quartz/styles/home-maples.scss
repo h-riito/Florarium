@@ -1,0 +1,211 @@
+body[data-slug="index"] {
+  .page,
+  .page > #quartz-body,
+  .center {
+    width: 100%;
+    max-width: none !important;
+    margin: 0;
+    padding: 0;
+  }
+
+  .page > #quartz-body {
+    display: block;
+  }
+
+  .sidebar,
+  .center > article,
+  .center > hr,
+  .center > .page-footer,
+  footer.garden-footer {
+    display: none !important;
+  }
+
+  .center > .page-header {
+    margin: 0 !important;
+  }
+}
+
+.maple-home {
+  --gutter: clamp(1.5rem, 7.5vw, 9rem);
+  box-sizing: border-box;
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100vh;
+  min-height: 100svh;
+  overflow: hidden;
+  padding: clamp(1rem, 3vh, 2.4rem) var(--gutter);
+  background: var(--light);
+  color: var(--dark);
+
+  .maple-ground {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .maple-controls {
+    justify-self: end;
+  }
+
+  .c-theme-toggle.darkmode {
+    display: grid;
+    place-items: center;
+    position: relative;
+    width: 44px;
+    height: 44px;
+    margin: 0;
+    border: 1px solid color-mix(in srgb, var(--dark) 24%, transparent);
+    border-radius: 50%;
+    background: var(--light);
+    color: var(--dark);
+    cursor: pointer;
+    > svg {
+      position: absolute;
+      inset: 12px;
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+  }
+
+  .maple-intro {
+    align-self: center;
+    padding: 3rem 0 4.5rem;
+  }
+
+  .garden-site-logo {
+    width: clamp(6rem, 9.5vw, 8.75rem);
+    color: var(--secondary);
+    margin-bottom: clamp(1rem, 2.5vh, 1.5rem);
+  }
+
+  h1.c-welcome {
+    margin: 0;
+    font-size: clamp(1.625rem, 4.6vw, 4rem);
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.04em;
+  }
+
+  .c-question {
+    display: inline-block;
+    width: fit-content;
+    max-width: 100%;
+  }
+
+  .c-activity-window {
+    display: inline-block;
+    vertical-align: bottom;
+    overflow: hidden;
+    white-space: nowrap;
+    &.is-width-ready {
+      transition: width 420ms ease;
+    }
+    > span {
+      display: inline-block;
+      background: linear-gradient(
+        to right bottom,
+        var(--dark) 0%,
+        color-mix(in srgb, var(--dark) 50%, var(--c-activity-color, var(--secondary))) 75%,
+        var(--c-activity-color, var(--secondary)) 100%
+      );
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      transition:
+        opacity 260ms,
+        transform 400ms;
+    }
+    .is-leaving,
+    .is-entering {
+      opacity: 0;
+    }
+    .is-leaving {
+      transform: translateY(-70%);
+    }
+    .is-entering {
+      transform: translateY(70%);
+      transition: none;
+    }
+  }
+
+  .maple-intro p {
+    width: fit-content;
+    color: var(--darkgray);
+    font-size: clamp(0.88rem, 1.15vw, 1.08rem);
+    margin: 0.5rem 0 0;
+    line-height: 1.75;
+  }
+
+  .maple-entries {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 2rem;
+    margin-top: clamp(1.6rem, 4vh, 2.8rem);
+    a {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      gap: 1.1rem;
+      border-bottom: 1px solid currentColor;
+      color: var(--secondary);
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      &::after {
+        content: "\2192";
+      }
+      &:hover {
+        color: var(--dark);
+      }
+    }
+  }
+
+  .maple-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: center;
+    font-size: 0.78rem;
+    color: var(--darkgray);
+    a {
+      color: inherit;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .maple-home {
+    h1.c-welcome {
+      font-size: clamp(1.25rem, 7.2vw, 2.5rem);
+    }
+    .c-question {
+      display: block;
+    }
+    .maple-intro {
+      padding-block: 3.25rem;
+    }
+    .maple-intro p {
+      max-width: 20em;
+    }
+  }
+}
+
+@media (forced-colors: active) {
+  .maple-home .c-activity-window > span {
+    -webkit-text-fill-color: CanvasText;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .maple-home .c-activity-window,
+  .maple-home .c-activity-window > span {
+    transition: none;
+    transform: none;
+  }
+}
