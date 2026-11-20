@@ -1,6 +1,29 @@
 import type { QuartzComponent, QuartzComponentConstructor } from "./types"
 import { resolveRelative, type FullSlug } from "../util/path"
 
+const readingSettings = [
+  {
+    id: "garden-font-size",
+    key: "garden-note-font-size",
+    label: "正文字号",
+    ends: ["小", "大"],
+    min: 90,
+    max: 120,
+    step: 1,
+    unit: "rem",
+  },
+  {
+    id: "garden-line-spacing",
+    key: "garden-note-line-spacing",
+    label: "行间距倍率",
+    ends: ["紧凑", "宽松"],
+    min: 80,
+    max: 150,
+    step: 5,
+    unit: "",
+  },
+] as const
+
 const GardenChrome: QuartzComponentConstructor = () => {
   const Component: QuartzComponent = ({ fileData, cfg }) => {
     const slug = fileData.slug
@@ -21,38 +44,43 @@ const GardenChrome: QuartzComponentConstructor = () => {
           <button
             type="button"
             class="garden-font-toggle"
-            aria-label="调整正文字号"
+            aria-label="调整正文排版"
             aria-haspopup="dialog"
             aria-expanded="false"
-            title="调整正文字号"
+            title="调整正文排版"
           >
             <span class="garden-font-icon" aria-hidden="true">
               <span>A</span>
               <span>A</span>
             </span>
           </button>
-          <div class="garden-font-menu" role="dialog" aria-label="正文字号" hidden>
-            <div class="garden-font-menu-header">
-              <span class="garden-font-menu-title">正文字号</span>
-              <output class="garden-font-value" for="garden-font-size">
-                100%
-              </output>
-            </div>
-            <label class="garden-font-slider" for="garden-font-size">
-              <input
-                id="garden-font-size"
-                type="range"
-                min="90"
-                max="120"
-                step="1"
-                value="100"
-                aria-label="正文字号"
-              />
-              <span class="garden-font-slider-labels" aria-hidden="true">
-                <span>小</span>
-                <span>大</span>
-              </span>
-            </label>
+          <div class="garden-font-menu" role="dialog" aria-label="正文排版" hidden>
+            {readingSettings.map(({ id, key, label, ends, min, max, step, unit }) => (
+              <div class="garden-font-setting" key={id}>
+                <div class="garden-font-menu-header">
+                  <label class="garden-font-menu-title" for={id}>
+                    {label}
+                  </label>
+                  <output class="garden-font-value" for={id}>
+                    {unit ? "100%" : "1.00×"}
+                  </output>
+                </div>
+                <input
+                  id={id}
+                  type="range"
+                  min={min}
+                  max={max}
+                  step={step}
+                  value="100"
+                  data-setting={key}
+                  data-unit={unit}
+                />
+                <div class="garden-font-slider-labels" aria-hidden="true">
+                  <span>{ends[0]}</span>
+                  <span>{ends[1]}</span>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
         <nav class="garden-responsive-bar" aria-label="紧凑页面导航">
@@ -115,8 +143,6 @@ const GardenChrome: QuartzComponentConstructor = () => {
       const fontControl = document.querySelector('[data-garden-font-control]')
       const fontToggle = fontControl?.querySelector('.garden-font-toggle')
       const fontMenu = fontControl?.querySelector('.garden-font-menu')
-      const fontRange = fontControl?.querySelector('#garden-font-size')
-      const fontValue = fontControl?.querySelector('.garden-font-value')
       const toolbarAnchor = document.createComment('garden-toolbar-position')
       const leftDrawerMedia = window.matchMedia('(max-width: 1050px)')
       const rightDrawerMedia = window.matchMedia('(max-width: 1499px)')
@@ -169,17 +195,11 @@ const GardenChrome: QuartzComponentConstructor = () => {
         fontControl.classList.add('is-ready')
       }
 
-      const storedFontSize = localStorage.getItem('garden-note-font-size')
-      const storedFontScale = Math.round(Number.parseFloat(storedFontSize ?? '1') * 100)
-      const initialFontScale = Number.isFinite(storedFontScale)
-        ? Math.min(120, Math.max(90, storedFontScale))
-        : 100
-
-      const applyFontScale = (fontScale) => {
-        const fontSize = fontScale / 100 + 'rem'
-        document.documentElement.style.setProperty('--garden-note-font-size', fontSize)
-        if (fontRange) fontRange.value = String(fontScale)
-        if (fontValue) fontValue.textContent = fontScale + '%'
+      const readingRanges = fontMenu?.querySelectorAll('input[data-setting]') ?? []
+      const updateReadingValue = (range) => {
+        const label = range.dataset.unit ? range.value + '%' : (range.valueAsNumber / 100).toFixed(2) + '×'
+        range.closest('.garden-font-setting').querySelector('output').value = label
+        range.setAttribute('aria-valuetext', label)
       }
 
       const closeFontMenu = () => {
@@ -200,12 +220,12 @@ const GardenChrome: QuartzComponentConstructor = () => {
         if (fontMenu) fontMenu.hidden = false
       }
 
-      const changeFontSize = (event) => {
-        const fontScale = Number(event.currentTarget.value)
-        if (!Number.isFinite(fontScale)) return
-        const fontSize = fontScale / 100 + 'rem'
-        localStorage.setItem('garden-note-font-size', fontSize)
-        applyFontScale(fontScale)
+      const changeReadingSetting = (event) => {
+        const range = event.currentTarget
+        const value = range.valueAsNumber / 100 + range.dataset.unit
+        document.documentElement.style.setProperty('--' + range.dataset.setting, value)
+        localStorage.setItem(range.dataset.setting, value)
+        updateReadingValue(range)
       }
 
       const closeFontMenuOutside = (event) => {
@@ -218,9 +238,13 @@ const GardenChrome: QuartzComponentConstructor = () => {
         fontToggle?.focus()
       }
 
-      applyFontScale(initialFontScale)
+      for (const range of readingRanges) {
+        const saved = document.documentElement.style.getPropertyValue('--' + range.dataset.setting)
+        range.value = String(Math.round(Number.parseFloat(saved || '1') * 100))
+        updateReadingValue(range)
+        range.addEventListener('input', changeReadingSetting)
+      }
       fontToggle?.addEventListener('click', toggleFontMenu)
-      fontRange?.addEventListener('input', changeFontSize)
       document.addEventListener('pointerdown', closeFontMenuOutside)
       document.addEventListener('keydown', closeFontMenuOnEscape)
 
@@ -359,8 +383,29 @@ const GardenChrome: QuartzComponentConstructor = () => {
         })
         .catch(() => {})
 
+      let indexScrollTimer
+      const showIndexScrollbar = (event) => {
+        if (event.target !== leftSidebar && !event.target.matches('.explorer-ul, .explorer-content')) return
+        leftSidebar.classList.add('is-index-scrolling')
+        window.clearTimeout(indexScrollTimer)
+        indexScrollTimer = window.setTimeout(() => leftSidebar.classList.remove('is-index-scrolling'), 550)
+      }
+      leftSidebar?.addEventListener('scroll', showIndexScrollbar, { capture: true, passive: true })
+
       const mathCleanups = []
+      // Let a glyph use the edge of the gutter instead of scrolling by a pixel or two.
+      const mathResize = new ResizeObserver((entries) => {
+        for (const { target } of entries) {
+          const block = target.closest('.katex-display')
+          const formula = block.firstElementChild
+          block.classList.toggle('fits-line', formula.offsetWidth <= block.clientWidth + 2)
+        }
+      })
       document.querySelectorAll('.katex-display').forEach((block) => {
+        if (block.firstElementChild) {
+          mathResize.observe(block)
+          mathResize.observe(block.firstElementChild)
+        }
         let hoverTimer
         const showScrollbar = () => {
           hoverTimer = window.setTimeout(() => block.classList.add('is-scroll-ready'), 500)
@@ -372,6 +417,7 @@ const GardenChrome: QuartzComponentConstructor = () => {
         const scrollFormula = (event) => {
           if (
             !block.classList.contains('is-scroll-ready') ||
+            block.classList.contains('fits-line') ||
             block.scrollWidth <= block.clientWidth
           ) return
 
@@ -398,7 +444,11 @@ const GardenChrome: QuartzComponentConstructor = () => {
       window.addCleanup(() => {
         observer?.disconnect()
         courseRevisionAbort.abort()
+        mathResize.disconnect()
         mathCleanups.forEach((cleanup) => cleanup())
+        leftSidebar?.removeEventListener('scroll', showIndexScrollbar, true)
+        window.clearTimeout(indexScrollTimer)
+        leftSidebar?.classList.remove('is-index-scrolling')
         leftToggle?.removeEventListener('click', toggleLeftDrawer)
         rightToggle?.removeEventListener('click', toggleRightDrawer)
         scrim?.removeEventListener('click', closeDrawers)
@@ -408,7 +458,7 @@ const GardenChrome: QuartzComponentConstructor = () => {
         leftDrawerMedia.removeEventListener('change', syncResponsiveChrome)
         rightDrawerMedia.removeEventListener('change', syncResponsiveChrome)
         fontToggle?.removeEventListener('click', toggleFontMenu)
-        fontRange?.removeEventListener('input', changeFontSize)
+        for (const range of readingRanges) range.removeEventListener('input', changeReadingSetting)
         document.removeEventListener('pointerdown', closeFontMenuOutside)
         document.removeEventListener('keydown', closeFontMenuOnEscape)
         if (toolbar && toolbarAnchor.parentNode) {
@@ -427,17 +477,17 @@ const GardenChrome: QuartzComponentConstructor = () => {
     document.addEventListener('nav', setupGardenChrome)
   `
 
-  Component.beforeDOMLoaded = `
-    const gardenFontSize = localStorage.getItem('garden-note-font-size')
-    const gardenFontScale = Math.round(Number.parseFloat(gardenFontSize ?? '1') * 100)
-    if (Number.isFinite(gardenFontScale)) {
-      const clampedGardenFontScale = Math.min(120, Math.max(90, gardenFontScale))
-      document.documentElement.style.setProperty(
-        '--garden-note-font-size',
-        clampedGardenFontScale / 100 + 'rem',
-      )
+  Component.beforeDOMLoaded = readingSettings
+    .map(
+      ({ key, min, max, unit }) => `
+    {
+      const saved = Number.parseFloat(localStorage.getItem('${key}') ?? '1')
+      const percent = Number.isFinite(saved) ? Math.min(${max}, Math.max(${min}, Math.round(saved * 100))) : 100
+      document.documentElement.style.setProperty('--${key}', percent / 100 + '${unit}')
     }
-  `
+  `,
+    )
+    .join("\n")
 
   return Component
 }

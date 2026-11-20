@@ -1,3 +1,5 @@
+import type { Root } from "hast"
+import { visit } from "unist-util-visit"
 import type { QuartzTransformerPlugin } from "../types"
 
 interface SourceRange {
@@ -40,6 +42,29 @@ function normalizeMathContent(content: string, quotePrefix: string): string {
 
 const ObsidianDisplayMath: QuartzTransformerPlugin = () => ({
   name: "ObsidianDisplayMath",
+  htmlPlugins() {
+    return [
+      () => (tree: Root) => {
+        visit(tree, "element", (node, _, parent) => {
+          const classes = node.properties.className
+          if (
+            node.tagName !== "code" ||
+            parent?.type !== "element" ||
+            parent.tagName !== "pre" ||
+            !Array.isArray(classes) ||
+            !classes.includes("language-math")
+          )
+            return
+
+          for (const child of node.children) {
+            if (child.type === "text") {
+              child.value = child.value.replace(/\\(begin|end)\s*\{align\}/g, "\\$1{align*}")
+            }
+          }
+        })
+      },
+    ]
+  },
   textTransform(_ctx, source) {
     const protectedRanges = fencedCodeRanges(source)
     const displayMath = /\$\$([\s\S]*?)\$\$/g

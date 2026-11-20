@@ -41,10 +41,53 @@
   --headerFont: var(--source-han-sans);
   --bodyFont: var(--source-han-sans);
   --garden-note-font-size: 1rem;
+  --garden-note-line-spacing: 1;
 }
 
 footer {
   font-size: 0.72rem;
+}
+
+@property --garden-index-thumb {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: transparent;
+}
+
+@media (forced-colors: none) {
+  .left.sidebar {
+    --garden-index-thumb: transparent;
+    transition: --garden-index-thumb 280ms ease-out;
+
+    &.is-index-scrolling {
+      --garden-index-thumb: var(--gray);
+    }
+
+    &,
+    .explorer-content,
+    .explorer-ul {
+      scrollbar-color: var(--garden-index-thumb) transparent;
+      scrollbar-width: thin;
+
+      @supports selector(::-webkit-scrollbar) {
+        scrollbar-width: auto;
+        scrollbar-color: auto;
+
+        &::-webkit-scrollbar {
+          width: 4px;
+        }
+
+        &::-webkit-scrollbar-track {
+          background: transparent;
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background: var(--garden-index-thumb);
+          border-radius: 4px;
+        }
+      }
+    }
+  }
 }
 
 // Keep the explorer quiet until an item is selected, with compact single-line labels.
@@ -217,7 +260,15 @@ body:not([data-slug="index"]) .center {
   font-size: var(--garden-note-font-size);
 
   :is(p, li, tbody) {
-    line-height: 1.6;
+    line-height: calc(1.6 * var(--garden-note-line-spacing));
+  }
+
+  :is(p, li) {
+    text-align: justify;
+  }
+
+  pre {
+    text-align: start;
   }
 
   a[role="anchor"],
@@ -315,7 +366,7 @@ body:not([data-slug="index"]) .center {
     letter-spacing: 0;
   }
 
-  .garden-font-slider {
+  .garden-font-setting {
     display: grid;
     gap: 0.25rem;
   }
@@ -346,8 +397,18 @@ body:not([data-slug="index"]) .center {
 }
 
 .katex-display {
+  display: block;
   scrollbar-color: transparent transparent;
   scrollbar-width: thin;
+
+  > .katex {
+    width: max-content;
+    min-width: 100%;
+  }
+
+  &.fits-line {
+    overflow: visible;
+  }
 
   &::-webkit-scrollbar {
     height: 0.45rem;
@@ -674,7 +735,9 @@ body:not([data-slug="index"]) .center {
     padding: 4.75rem 2rem 2rem;
     position: fixed;
     transform: translateX(-105%);
-    transition: transform 220ms ease;
+    transition:
+      transform 220ms ease,
+      --garden-index-thumb 280ms ease-out;
     width: 320px;
     z-index: 205;
 
