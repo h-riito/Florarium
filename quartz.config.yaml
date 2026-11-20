@@ -4,7 +4,9 @@ configuration:
   pageTitleSuffix: " · Florarium"
   enableSPA: true
   enablePopovers: true
-  analytics: null
+  analytics:
+    provider: goatcounter
+    websiteId: riito
   locale: zh-CN
   baseUrl: h-riito.github.io/Florarium
   ignorePatterns:

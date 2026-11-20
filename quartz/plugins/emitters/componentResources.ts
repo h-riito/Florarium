@@ -140,25 +140,23 @@ function addGlobalPageResources(ctx: BuildCtx, componentResources: ComponentReso
     `)
   } else if (cfg.analytics?.provider === "goatcounter") {
     componentResources.afterDOMLoaded.push(`
-      const goatcounterScriptPre = document.createElement('script');
-      goatcounterScriptPre.textContent = \`
-        window.goatcounter = { no_onload: true };
-      \`;
-      document.head.appendChild(goatcounterScriptPre);
-
       const endpoint = "https://${cfg.analytics.websiteId}.${cfg.analytics.host ?? "goatcounter.com"}/count";
+      window.goatcounter = { no_onload: true, endpoint };
       const goatcounterScript = document.createElement('script');
       goatcounterScript.src = "${cfg.analytics.scriptSrc ?? "https://gc.zgo.at/count.js"}";
-      goatcounterScript.defer = true;
+      goatcounterScript.async = true;
+      goatcounterScript.setAttribute('data-persist', '');
       goatcounterScript.setAttribute('data-goatcounter', endpoint);
-      goatcounterScript.onload = () => {
-        window.goatcounter.endpoint = endpoint;
-        goatcounter.count({ path: location.pathname });
-        document.addEventListener('nav', () => {
-          goatcounter.count({ path: location.pathname });
-        });
-      };
+      const goatcounterReady = new Promise(resolve => {
+        goatcounterScript.onload = resolve;
+        goatcounterScript.onerror = resolve;
+      });
 
+      document.addEventListener('nav', async () => {
+        const page = { path: location.pathname, title: document.title };
+        await goatcounterReady;
+        window.goatcounter.count?.(page);
+      });
       document.head.appendChild(goatcounterScript);
     `)
   } else if (cfg.analytics?.provider === "posthog") {
