@@ -33,29 +33,6 @@
   font-display: swap;
 }
 
-// Limit Lanting to Han characters and CJK punctuation.
-$lanting-faces: (
-  (400, "FZLTHProS", "regular"),
-  (500, "FZLTHProS Medium", "medium"),
-  (600, "FZLTHProS DemiBold", "demibold"),
-  (700, "FZLTHProS Bold", "bold")
-);
-
-@each $weight, $face, $file in $lanting-faces {
-  @font-face {
-    font-family: "Garden Lanting Pro";
-    src:
-      local($face),
-      url("./static/fonts/fz-lanting-pro-#{$file}.woff2") format("woff2");
-    font-style: normal;
-    font-weight: $weight;
-    font-display: swap;
-    unicode-range:
-      U+2E80-2FDF, U+3000-303F, U+31C0-31EF, U+3400-4DBF, U+4E00-9FFF, U+F900-FAFF, U+FE10-FE1F,
-      U+FE30-FE4F, U+FF01-FF60, U+FFE0-FFE6, U+20000-2FA1F, U+30000-3347F;
-  }
-}
-
 :root {
   --source-han-sans:
     "Garden Source Han Sans", "思源黑体 CN", "Source Han Sans CN", "Source Han Sans SC",
@@ -279,10 +256,7 @@ body:not([data-slug="index"]) .center {
 // Keep ordinary article content on one stable cursor. Real links remain clickable,
 // while the heading-anchor glyph no longer flips the cursor as it fades in.
 .center article .markdown-preview-view {
-  --bodyFont: "Garden Lanting Pro", var(--source-han-sans);
-  --headerFont: var(--bodyFont);
   cursor: default;
-  font-family: var(--bodyFont);
   font-size: var(--garden-note-font-size);
 
   :is(p, li, tbody) {
